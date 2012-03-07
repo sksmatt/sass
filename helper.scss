@@ -1,0 +1,527 @@
+/////////////////////////////////////////////////////////////////////////////
+// SASS Helper                                                          
+//                                                                      
+//                                                                      
+// @package         COST                                                
+// @author          Matt Varone <contact@mattvarone.com>                
+// @copyright       Copyright (c) 2011, Matt Varone                     
+// @license         MIT                                                 
+// @version         1.0                                                 
+////////////////////////////////////////////////////////////////////////////
+
+// Compasss dependencies
+@import "compass/layout";
+@import "compass-colors";
+
+//--------------------------------------------------------------------------
+//                                                    CONFIGURABLE VARIABLES
+//--------------------------------------------------------------------------
+
+////////////////////////////////////////////////////////////////////////////
+// Global Variables                                                       
+////////////////////////////////////////////////////////////////////////////
+
+$in-development     :true                                   !default;   // boolean
+$unit-global        :rem                                    !default;   // px / em / rem
+
+////////////////////////////////////////////////////////////////////////////
+// Variables for: GRID                                                    
+////////////////////////////////////////////////////////////////////////////
+
+// 1140:    55-40-12
+// 960:     60-20-12
+// 960:     40-20-16    
+// 940:  140-20-6
+
+$grid-columns           :9                                  !default;   // integer
+$grid-column-width      :60                                 !default;   // pixels
+$grid-gutter-width      :35                                 !default;   // pixels
+$grid-min-width         :320                                !default;   // pixels
+$grid-leading           :17                                 !default;   // pixels
+
+$grid-columns-color     :rgba(0, 255, 0, 0.1)               !default;   // colour
+$grid-baseline-color    :rgba(255, 0, 0, 0.1)               !default;   // colour
+
+////////////////////////////////////////////////////////////////////////////
+// Variables for: TYPOGRAPHY                                              
+////////////////////////////////////////////////////////////////////////////
+
+$font-size-body     :13                                     !default;   // px
+$line-height-rel    :1.46153846                             !default;   // px
+$line-height        :$line-height-rel *  $font-size-body    !default;   // px
+
+$font-size-rel      :$font-size-body * 2                    !default;   // px
+
+$font-size-title    :45.003                                 !default;   // px
+$font-size-h1       :25.327                                 !default;   // px
+$font-size-h2       :23.100                                 !default;   // px
+$font-size-h3       :19.000                                 !default;   // px
+$font-size-h4       :10                                     !default;   // px
+$font-size-h5       :14.254                                 !default;   // px
+$font-size-h6       :10.693                                 !default;   // px
+
+$font-size-bigger   :17.329                                 !default;   // px
+$font-size-small    :10.693                                 !default;   // px
+$font-size-smaller  :10.693                                 !default;   // px
+
+$font-stack-base    :Merriweather, Georgia, serif !default;
+$font-stack-alt     :Georgia, serif !default;
+$font-stack-aux     :"Baskerville", "Palatino", "Book Antiqua", serif !default;
+
+
+////////////////////////////////////////////////////////////////////////////
+// Variables for: STACKS                                                  
+////////////////////////////////////////////////////////////////////////////
+
+$stack-headings     : "h1,h2,h3,h4,h5,h6"                   !default;
+
+
+////////////////////////////////////////////////////////////////////////////
+// Variables for: COLOR                                                   
+////////////////////////////////////////////////////////////////////////////
+
+$color-body         :#444                                   !default;   // color
+$color-links        :#D54E21                                !default;   // color
+$color-hover        :saturate($color-links,12%)             !default;   // color
+$color-visited      :$color-links                           !default;   // color
+
+$color-selection    :white                                  !default;   // color
+$color-selection-bg :$color-links                           !default;   // color
+$color-focus        :#faf9dc                                !default;
+$color-border       :#ccc                                   !default;   // color
+$color-bg-items     :#e7e7e2;
+
+$color-scheme-1     :#009EE8                                !default;   // color
+$color-scheme-2     :darken($color-links,10%)               !default;   // color
+$color-scheme-3     :white                                  !default;   // color
+$color-scheme-4     :$color-bg-items                        !default;   // color
+$color-scheme-5     :#fe850b                                !default;   // color
+$color-scheme-6     :darken($color-scheme-5,15%)            !default;   // color
+$color-scheme-7     :#1A8C4A                                !default;   // color
+$color-scheme-8     :darken($color-scheme-7,15%)            !default;   // color
+
+$color-grey         :#999                                   !default; 
+$color-green        :green                                  !default;
+$color-brand        :$color-scheme-1                        !default;
+
+$color-clean        :#efefef                                !default;
+$color-info         :#009ee8                                !default;
+$color-success      :#d7f7c4                                !default;
+$color-notice       :#fef5be                                !default;
+$color-error        :#ffcdd1                                !default;
+
+$color-comp         :adjust_hue($color-links,180);
+$color-comp         :darken($color-comp,45%);
+
+////////////////////////////////////////////////////////////////////////////
+// Variables for: STYLE                                                   
+////////////////////////////////////////////////////////////////////////////
+
+$radius-border: 3                                           !default;
+
+////////////////////////////////////////////////////////////////////////////
+// Variables for: LINKS                                                   
+////////////////////////////////////////////////////////////////////////////
+
+$text-decoration            : none                          !default;
+$text-decoration-hover      : underline                     !default;
+
+////////////////////////////////////////////////////////////////////////////
+// ...................................................................... //
+// ......................... FUNCTIONS .................................. //
+// ...................................................................... //
+////////////////////////////////////////////////////////////////////////////
+
+@function __rate_rel( $n:1, $f:$font-size-body, $r:$scale-rhythm ) {
+     @return ( $f * $r * $n ) / $f * 1rem;
+}
+
+//--------------------------------------------------------------------------
+//                                                         GRID CALCULATIONS
+//--------------------------------------------------------------------------
+
+@mixin grid_container( $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width )
+{
+    max-width: __grid_calculate_max_width( $c, $w, $g ) * 1px;
+    min-width: $grid-min-width * 1px;
+    
+    @if ( $in-development == true ) {
+    
+        &.grid-vertical {
+            @include grid_bg_vertical;
+        }
+    
+    }
+}
+
+@mixin grid_container_padding( $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width )
+{
+    padding:0 ( $g / 4 ) / __grid_calculate_max_width( $c, $w, $g ) * 100%;
+}
+
+@mixin grid_center(){
+    margin-left:auto;
+    margin-right:auto;
+}
+
+@mixin grid_bg_vertical( $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width, $o: 0px, $x:$grid-columns-color ) {
+    @include column-grid-background( $c, $w, $g, $o, $x );
+    overflow:hidden;
+}
+
+@mixin grid_bg_baseline( $l:$line-height, $c:$grid-baseline-color ) {
+    @include baseline-grid-background( __px($l), $c );
+}
+
+@mixin grid_row()
+{
+    width: 100%;
+    clear: both;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+@mixin _col()
+{
+    float: left;
+    min-height: 1px;
+}
+
+@mixin grid_col( $n:1, $l: false, $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width )
+{
+    @include _col();
+    width:( ( ( $w + $g ) * $n ) - $g ) / ( __grid_calculate_max_width( $c, $w, $g ) ) * 100%; 
+    @if $l == false {
+        margin-right: $g / ( __grid_calculate_max_width( $c, $w, $g ) ) * 100%;
+    }
+}
+
+@mixin grid_col_lead( $n:1, $lead:$grid-leading, $last:false, $lead-to:left, $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width )
+{
+    @include _col();
+    $_max-width: __grid_calculate_max_width( $c, $w, $g );
+    $_lead: $lead / ( $_max-width ) * 100%;
+    $_margin: ( $g ) / ( $_max-width ) * 100%;
+    
+    @if $lead-to == left 
+    {
+        width:( ( ( $w + $g ) * $n ) - $g - $lead ) / ( $_max-width ) * 100%; 
+        padding-left:$_lead;
+        @if $last != true  {
+            margin-right:$_margin;
+        }
+    } 
+    @else if $lead-to == right  
+    {
+        width:( ( ( $w + $g ) * $n ) - $g - $lead ) / ( $_max-width ) * 100%;
+        padding-right:$_lead;
+        @if $last != true  {
+            margin-right:$_margin;
+        }
+    }
+    @else
+    {
+        $_lead-double:$lead * 2;
+        width:( ( ( $w + $g ) * $n ) - $g - $_lead-double ) / ( $_max-width ) * 100%;
+        padding-left:$_lead;
+        padding-right:$_lead;
+        @if $last != true  {
+            margin-right:$_margin;
+        }
+    }
+}
+
+@mixin grid_col_minus( $n:1, $minus:0, $push:0, $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width )
+{
+    @include _col();
+    $_max-width: __grid_calculate_max_width( $c, $w, $g );
+    width:( ( ( $w + $g ) * $n ) - $g - $minus ) / ( $_max-width ) * 100%;
+    margin-right:( ( $g + $push ) / ( $_max-width ) ) * 100%;
+}
+
+
+@mixin grid_offset( $n:1, $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width )
+{
+    margin-left:( ( $w + $g ) * $n ) / __grid_calculate_max_width( $c, $w, $g ) * 100%;
+}
+
+@mixin grid_offset_padding( $n:1, $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width )
+{
+    padding-left:( ( $w + $g ) * $n ) / __grid_calculate_max_width( $c, $w, $g ) * 100%;
+}
+
+
+
+@mixin grid_push( $n:1, $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width )
+{
+    margin-right:( ( $w + $g ) * $n ) / __grid_calculate_max_width( $c, $w, $g ) * 100%;
+}
+
+@mixin grid_first()
+{
+    margin-left:0;
+    clear:left;
+}
+
+@mixin grid_last()
+{
+    margin-right:0;
+    clear:right;
+}
+
+@mixin grid_reset()
+{
+    min-width: 0;
+    margin-left: 0px;
+    margin-right: 0px;
+}
+
+@mixin grid_reset_body( $paddings:true, $r:1, $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width  )
+{
+    @include grid_reset();
+    width:auto;
+    
+    @if $paddings == true {
+        padding-left:( $g * $r ) / __grid_calculate_max_width( $c, $w, $g ) * 100%;
+        padding-right:( $g * $r ) / __grid_calculate_max_width( $c, $w, $g ) * 100%;
+    }   
+}
+
+@mixin grid_reset_container()
+{
+    @include grid_reset();
+    width:auto;
+    max-width:100%;
+}
+
+@mixin grid_reset_col(){
+    @include grid_reset();
+    width: 100%;
+    float: none;
+    padding-left:0;
+    padding-right:0;
+    clear:both;
+}
+
+//////////////////////////////////////////////////////// Calculate Max Width
+
+@function __grid_calculate_max_width( $c:$grid-columns, $w:$grid-column-width, $g:$grid-gutter-width ) {
+    @return ( $w * $c ) + ( ( $g * $c ) - $g );
+}
+
+@function __gr( $n:1, $i:1 ) {
+    @return $n * ( $i * 1.61803399 );
+}
+
+@function __cr( $n:1, $i:1, $r:1.333 ) {
+    @return $n * ( $i * $r );
+}
+
+//--------------------------------------------------------------------------
+//                                                   TYPOGRAPHY CALCULATIONS 
+//--------------------------------------------------------------------------
+
+@mixin typo_body( $s:1em, $l: $line-height, $f:$font-stack-base ) {
+    font: #{$s} / #{__rel($l)} $f;
+    
+    @if ( $in-development == true ) {
+        
+        &.grid-baseline {
+            @include grid_bg_baseline;
+        }
+    
+    }
+}
+
+@mixin typo_size( $s:$font-size-body , $l:0 ) {
+        
+    font-size: $s * 1px;
+    font-size: __rem( $s );
+    
+    @if $l > 0 {
+        line-height: $l * 1px;
+        line-height: __rem( $l );
+    }
+}
+
+// 3,2
+// 6,5
+// 5,4
+
+@mixin typo_intercalate(
+    $l:1, //lines
+    $r:1, //relative-lines
+    $f:   $font-size-body
+){
+    $new-size: __typo_intercalate( $l, $r, $f );
+    font-size: __px( $new-size );
+    font-size: __rem( $new-size );
+}
+
+@mixin typo_intercalate_with_margin(
+    $l:1, //lines
+    $r:1, //relative-lines
+    $f: $font-size-body
+){
+    @include typo_intercalate( $l, $r, $f );
+    @include typo_intercalate_margin_top( $l, $r, $f );
+}
+
+@mixin typo_intercalate_margin_top(
+    $l:1, //lines
+    $r:1, //relative-lines
+    $f: $font-size-body
+){
+    $new-size: __typo_intercalate( $l, $r, $f );    
+    $margin: $f - $new-size - 1.8;
+    margin-top: __px($margin);
+    margin-top: __rem($margin);
+}
+
+@function __typo_intercalate($lines:1,$relative-lines:1,$f: $font-size-body) {
+    @return ( $f * $relative-lines ) / $lines;
+}
+
+@function __typo_rel( $n:1, $f:$font-size-body, $l:$line-height ) {
+     @return $f * ( $l / $f ) * $n;
+}
+
+@function __typo_n( $n:1, $f:$font-size-body, $l:$line-height ) {
+     @return $f * $n;
+}
+
+@function __typo_rel_i( $l:1, $r:1, $n:1, $f:$font-size-body, $h:$line-height ) {
+    $new-size: __typo_intercalate( $l, $r, $f );
+    $new-line-height:( $h / $f ) * $new-size;
+    @return $new-size * ( $new-line-height / $new-size ) * $n;
+}
+
+@mixin css_line_h( $n: $line-height ) {
+    line-height: __px( $n );
+    line-height: __rem( $n );
+}
+
+@mixin clear() {
+    content: "\0020";
+    display: block;
+    height: 0;
+    clear: both;
+    overflow: hidden;
+    visibility: hidden 
+}
+
+// MARGIN //////////////////////////////////////////////////////////////////
+
+@mixin css_rem_margin( $t:0, $r:0, $b:0, $l:0 ) {
+    
+    @if ( $t == $b ) {
+    
+        @if ( $r == $l ) {                  
+            margin:__px( $t) __px( $r );
+            margin:__rem( $t) __rem( $r );
+        }
+    
+    } @else if ( $r == $l ) {
+        
+    margin:__px( $t ) __px( $r ) __px( $b );
+    margin:__rem( $t ) __rem( $r ) __rem( $b );
+    
+    } @else {
+    
+    margin:__px( $t ) __px( $r ) __px( $b ) __px( $l );
+    margin:__rem( $t ) __rem( $r ) __rem( $b ) __rem( $l ); 
+    
+    }
+
+}
+
+@mixin css_rem_margin_( $w:top, $n:1 ) {
+    margin-#{$w}: __px( $n );
+    margin-#{$w}: __rem( $n );
+}
+
+// PADDING ////////////////////////////////////////////////////////////////
+
+@mixin css_rem_padding( $t:0, $r:0, $b:0, $l:0 ) {
+    
+    @if ( $t == $b ) {
+    
+        @if ( $r == $l ) {                  
+            padding:__px( $t ) __px( $r );
+            padding:__rem( $t ) __rem( $r );
+        }
+    
+    } @else if ( $r == $l ) {
+        
+    padding:__px( $t ) __px( $r ) __px( $b );
+    padding:__rem( $t ) __rem( $r ) __rem( $b );
+    
+    } @else {
+    
+    padding:__px( $t ) __px( $r ) __px( $b ) __px( $l );
+    padding:__rem( $t ) __rem( $r ) __rem( $b ) __rem( $l );    
+    
+    }
+
+}
+
+@mixin css_rem_padding_( $w:top, $n:1 ) {
+    padding-#{$w}: __px( $n );
+    padding-#{$w}: __rem( $n );
+}
+
+// CONVERSION ///////////////////////////////////////////////////////////////
+
+// Returns unit in pixels
+@function __px( $n ) {
+    @if $n == 0 { 
+        @return $n;
+    } @else if ( $n == auto ) {
+        @return $n;
+    } @else {
+        @return #{$n}px; 
+    }
+}
+
+// Returns unit percentage based on 16 or any specified number 
+@function __per( $n, $d:16 ) {
+    @if $n == 0 { 
+        @return $n;
+    } @else if ( $n == auto ) {
+        @return $n;
+    } @else {
+        @return $n / $d * 100 * 1%;
+    }
+}
+
+// Returns unit in em based on the body font size or any specified number
+@function __em( $n, $d:$font-size-body ) {
+    @if ( $n == 0 ) { 
+        @return $n;
+    } @else if ( $n == auto ) {
+        @return $n;
+    } @else {
+        @return __rel($n,$d) * 1em; 
+    }
+}
+
+// Returns unit in rem based on the body font size or any specified number 
+@function __rem( $n, $d:$font-size-body ) {
+    @if ( $n == 0 ) { 
+        @return $n;
+    } @else if ( $n == auto ) {
+        @return $n;
+    } @else {
+        @return __rel($n,$d) * 1rem;
+    }
+}
+
+// Returns relative unit based on the body font size or any specified number
+@function __rel( $n, $d:$font-size-body ) {
+    @return $n / $d; 
+}
+
+// Returns product unit based on the body font size or any specified number
+@function __pro( $n, $d:$font-size-body ) {
+    @return $n * $d; 
+}
